@@ -1,4 +1,4 @@
-package ChatServer;
+package chatServer;
 
 public class Server {
     private int serverid;
