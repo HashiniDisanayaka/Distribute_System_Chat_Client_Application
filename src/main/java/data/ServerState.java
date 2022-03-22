@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +21,7 @@ public class ServerState {
     private int coordination_port;
     private int serverIdentity;
     private int numOfPriorServers;
+    private int serverValue;
 
     private static ServerState stateInstance;
     private Room mainHall;
@@ -120,5 +123,34 @@ public class ServerState {
 
     public ConcurrentHashMap<Integer, String> getSuspectedList() {
         return suspectedList;
+    }
+
+    public int getServerValue() {
+        return serverValue;
+    }
+
+    public int getNumberOfPriorServers() {
+        return numOfPriorServers;
+    }
+
+    public List<String> getClientIdList() {
+        List<String> clientIdList = new ArrayList<>();
+        setOfRooms.forEach((roomID, room) -> {
+            clientIdList.addAll(room.getClientStateMap().keySet());
+        });
+        return clientIdList;
+    }
+
+    public List<List<String>> getChatRoomList() {
+        List<List<String>> chatRoomList = new ArrayList<>();
+        for (Room room: setOfRooms.values()) {
+            List<String> roomInfo = new ArrayList<>();
+            roomInfo.add( room.getOwnerId() );
+            roomInfo.add( room.getRoomID() );
+            roomInfo.add( String.valueOf(room.getServerID()) );
+
+            chatRoomList.add( roomInfo );
+        }
+        return chatRoomList;
     }
 }

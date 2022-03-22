@@ -7,6 +7,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import services.LeaderElection.FastBullyAlgorithm;
 import services.heartbeat.Gossiping;
 
 import java.io.IOException;
@@ -53,6 +54,10 @@ public class ServerMain {
             serverThreadHandler.start();
 
             //leader election
+            FastBullyAlgorithm.initialize();
+
+            Runnable heartbeat = new FastBullyAlgorithm("Heartbeat");
+            new Thread(heartbeat).start();
 
             //heartbeat
             if(isGossiping){
