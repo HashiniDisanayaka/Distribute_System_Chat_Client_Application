@@ -22,4 +22,12 @@ public class Server {
         this.serverid = serverid;
     }
 
+    public String getServer_address(){
+        return server_address;
+    }
+
+    public int getCoordination_port() {
+        return coordination_port;
+    }
+
 }

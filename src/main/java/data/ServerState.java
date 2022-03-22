@@ -26,6 +26,8 @@ public class ServerState {
     private final ConcurrentHashMap<Integer, Server> setOfservers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Room> setOfRooms = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, ClientThreadHandler> setOfClientThreadHandlers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Integer> listOfHeartbeat = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, String> suspectedList = new ConcurrentHashMap<>();
 
     private ServerState () {}
 
@@ -70,7 +72,7 @@ public class ServerState {
             }
             readFile.close();
         } catch (FileNotFoundException e) {
-            System.out.println("ERR | Config file not found");
+            System.out.println("[ERR] | Config file not found");
             log.error("Config file cannot find : " , e);
             e.printStackTrace();
         }
@@ -100,7 +102,23 @@ public class ServerState {
         return coordination_port;
     }
 
+    public int getServerIdentity () {
+        return  serverIdentity;
+    }
+
+    public ConcurrentHashMap<Integer, Server> getServers() {
+        return setOfservers;
+    }
+
     public void addClientThreadHandler(ClientThreadHandler clientThreadHandler) {
         setOfClientThreadHandlers.put(clientThreadHandler.getId(), clientThreadHandler);
+    }
+
+    public ConcurrentHashMap<Integer, Integer> getListOfHeartbeat() {
+        return listOfHeartbeat;
+    }
+
+    public ConcurrentHashMap<Integer, String> getSuspectedList() {
+        return suspectedList;
     }
 }
