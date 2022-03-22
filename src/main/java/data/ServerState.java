@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class ServerState {
@@ -28,6 +29,9 @@ public class ServerState {
     private final ConcurrentHashMap<Long, ClientThreadHandler> setOfClientThreadHandlers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Integer> listOfHeartbeat = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, String> suspectedList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> setOfVotes = new ConcurrentHashMap<>();
+
+    private AtomicBoolean consensus_ongoing = new AtomicBoolean(false);
 
     private ServerState () {}
 
@@ -106,7 +110,7 @@ public class ServerState {
         return  serverIdentity;
     }
 
-    public ConcurrentHashMap<Integer, Server> getServers() {
+    public ConcurrentHashMap<Integer, Server> getSetOfservers() {
         return setOfservers;
     }
 
@@ -121,4 +125,21 @@ public class ServerState {
     public ConcurrentHashMap<Integer, String> getSuspectedList() {
         return suspectedList;
     }
+
+    public AtomicBoolean consensus_ongoing() {
+        return consensus_ongoing;
+    }
+
+    public ConcurrentHashMap<String, Integer> getSetOfVotes() {
+        return setOfVotes;
+    }
+
+    public synchronized void removeServerFromListOfHeartbeat(Integer serverIdentity) {
+        listOfHeartbeat.remove(serverIdentity);
+    }
+
+    public synchronized void removeServerFromSuspectedList(Integer serverIdentity) {
+        suspectedList.remove(serverIdentity);
+    }
+
 }
