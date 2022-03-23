@@ -30,19 +30,19 @@ Command for execute the chat server
 
 > `java -jar server.jar [server_name] "[location of server configuration file]"`
 
-eg: java -jar server.jar s1 "C:code\src\main\java\config\server_conf.txt"
+eg: java -jar server.jar s1 "myPathToProject\src\main\java\config\server_conf.txt"
 ## Instructions to Build the executable Jar
 Development Environment - `IntelliJ IDEA`
 
-> install java (version `1.8`)
+> install java (version `17.0.2`)
 > 
-> install Maven (version `3.6.3`)
+> install Maven (version `4.0.0`)
 
-run the following commands to install dependencies and build
+steps to build the executable jar file:
 
-> `mvn clean install`
->
-> `mvn clean compile assembly:single`
+- Add an artifact using the project structure : File -> Project Structure.. -> Artifacts -> Add -> JAR -> From modules with dependencies..
+- Add main class -> Apply -> OK
+- Then Build -> Build Artifacts.. -> Build
 
 The output jar will be created inside the `'target'` folder named `Distributed-Chat-System-1.0-SNAPSHOT-jar-with-dependencies.jar`
 ## Instructions to Run the Jar
