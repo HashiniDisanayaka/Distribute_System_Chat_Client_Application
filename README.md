@@ -30,7 +30,7 @@ Command for execute the chat server
 
 > `java -jar server.jar [server_name] "[location of server configuration file]"`
 
-eg: java -jar server.jar s1 "myPathToProject\src\main\java\config\server_conf.txt"
+eg: java -jar server.jar s1 "myPathToProject\src\main\java\config\config.txt"
 ## Instructions to Build the executable Jar
 Development Environment - `IntelliJ IDEA`
 
@@ -44,11 +44,11 @@ steps to build the executable jar file:
 - Add main class -> Apply -> OK
 - Then Build -> Build Artifacts.. -> Build
 
-The output jar will be created inside the `'target'` folder named `Distributed-Chat-System-1.0-SNAPSHOT-jar-with-dependencies.jar`
+The output jar will be created inside the `'out'` folder named `Distributed_System_Chat_Client_Application.jar`
 ## Instructions to Run the Jar
 run the following command in a terminal
 
-> `java -jar Distributed-Chat-System-1.0-SNAPSHOT-jar-with-dependencies.jar s1 "C:code\src\main\java\config\server_conf.txt"`
+> `java -jar Distributed_System_Chat_Client_Application.jar s1 "C:code\src\main\java\config\config.txt"`
 >
 note `s1` should be changed according to the server instance.
-note the path to the `server_conf.txt` should be given according to the configuration file location.
+note the path to the `config.txt` should be given according to the configuration file location.
