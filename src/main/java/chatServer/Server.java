@@ -30,4 +30,8 @@ public class Server {
         return coordination_port;
     }
 
+    public int getClients_port() {
+        return clients_port;
+    }
+
 }

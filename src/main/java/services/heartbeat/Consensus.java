@@ -7,7 +7,7 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import services.LeaderElection.Leader;
+import services.leaderElection.Leader;
 import services.message.MessagePassing;
 import services.message.MessageServer;
 
@@ -101,4 +101,66 @@ public class Consensus implements Job {
         }
 
     }
+
+    public static void voteHandler (JSONObject jsonObject){
+
+        ServerState serverState = ServerState.getInstance();
+        MessageServer messageServer = MessageServer.getInstance();
+
+        Integer suspectServerId = (int) (long)jsonObject.get("suspectServerIdentity");
+        Integer serverIdentity = serverState.getServerIdentity();
+
+        if (serverState.getSuspectedList().containsKey(suspectServerId)) {
+            if (serverState.getSuspectedList().get(suspectServerId).equals("SUSPECTED")) {
+                JSONObject answerMessage = messageServer.answerMessage(suspectServerId, "YES", serverIdentity);
+                try {
+                    MessagePassing.sender(answerMessage, serverState.getSetOfservers().get(Leader.getLeader().getLeaderID()));
+                    System.out.println(String.format("[LOG] | Voting on suspected server: [%s] vote: YES", suspectServerId));
+                } catch (Exception e) {
+                    System.out.println("[ERR] | Voting on suspected server is failed");
+                }
+
+            } else {
+
+                JSONObject answerVoteMessage = messageServer.answerMessage(suspectServerId, "NO", serverIdentity);
+                try {
+                    MessagePassing.sender(answerVoteMessage, serverState.getSetOfservers().get(Leader.getLeader().getLeaderID()));
+                    System.out.println(String.format("INFO : Voting on suspected server: [%s] vote: NO", suspectServerId));
+                } catch (Exception e) {
+                    System.out.println("ERROR : Voting on suspected server is failed");
+                }
+            }
+        }
+
+    }
+
+    public static void answerVoteHandler(JSONObject j_object){
+        ServerState serverState = ServerState.getInstance();
+        Integer suspectServerId = (int) (long)j_object.get("suspectServerIdentity");
+        String vote = (String) j_object.get("vote");
+        Integer votedId = (int) (long)j_object.get("votedId");
+        Integer voteCount = serverState.getSetOfVotes().get(vote);
+
+        System.out.println(String.format("[LOG] | Receiving voting to kick [%s]: [%s] voted by server: [%s]", suspectServerId, vote, votedId));
+
+        if (voteCount == null) {
+            serverState.getSetOfVotes().put(vote, 1);
+        } else {
+            serverState.getSetOfVotes().put(vote, voteCount + 1);
+        }
+
+    }
+
+    public static void notifyServerDownHandler(JSONObject j_object){
+        ServerState serverState = ServerState.getInstance();
+        Leader leader = Leader.getLeader();
+        Integer serverId = (int) (long)j_object.get("serverId");
+
+        System.out.println("[LOG] | Server down notification received. Removing server: " + serverId);
+
+        leader.removeRemoteChatRoom(serverId);
+        serverState.removeServerFromListOfHeartbeat(serverId);
+        serverState.removeServerFromSuspectedList(serverId);
+    }
+
 }

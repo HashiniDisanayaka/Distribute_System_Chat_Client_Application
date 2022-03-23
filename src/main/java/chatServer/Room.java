@@ -34,4 +34,7 @@ public class Room {
     public synchronized void addMembers(Client clientState) {
         this.setOfClients.put(clientState.getClientID(), clientState);
     }
+    public synchronized void removeMembers(String clientId) {
+        this.setOfClients.remove(clientId);
+    }
 }
