@@ -72,7 +72,7 @@ public class Gossiping implements Job{
                 MessagePassing.Sender(gossipingMessage, remoteServerArray.get(serverId));
                 System.out.println("[LOG] | Gossip heatrbeat information to s" + remoteServerArray.get(serverId).getServerIdentity());
             } catch (IOException e){
-                System.out.println("[WARN] | Server s" + remoteServerArray.get(serverId).getServerIdentity() + " has failed");
+                System.out.println("[ERR] | Server s" + remoteServerArray.get(serverId).getServerIdentity() + " has failed");
             }
         }
 

@@ -22,4 +22,16 @@ public class Room {
     public synchronized HashMap<String, Client> getSetOfClients() {
         return setOfClients;
     }
+
+    public String getOwnerId() {
+        return clientId;
+    }
+
+    public synchronized String getRoomID() {
+        return roomId;
+    }
+
+    public synchronized void addMembers(Client clientState) {
+        this.setOfClients.put(clientState.getClientID(), clientState);
+    }
 }
