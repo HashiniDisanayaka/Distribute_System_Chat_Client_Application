@@ -13,7 +13,23 @@ Chat clients can join at most one, any available server. Chat clients are progra
 - **Send chat messages to other chat clients connected to the *same chat room***
  
 ## Chat Server
-There are multiple servers working together to perform tasks for chat clients, where a server is capable of accepting multiple incoming TCP connections from chat clients. After the system is active the number of servers in the system is fixed. The server is responsible for managing a subset of chat rooms. When a server receives a request to create a chat room from a client and creates a chat room, that chat room is managed by the server which created the chat room. When a client wants to move from one chat room to another, if the two rooms are connected to different servers then the client also should connect to the relevant server. The server is responsible for broadcasting messages to the members of the same chat room. And all of the servers maintain a list of chat rooms available in the system.  
+There are multiple servers working together to perform tasks for chat clients, where a server is capable of accepting multiple incoming TCP connections from chat clients. After the system is active the number of servers in the system is fixed. The server is responsible for managing a subset of chat rooms. When a server receives a request to create a chat room from a client and creates a chat room, that chat room is managed by the server which created the chat room. When a client wants to move from one chat room to another, if the two rooms are connected to different servers then the client also should connect to the relevant server. The server is responsible for broadcasting messages to the members of the same chat room. And all of the servers maintain a list of chat rooms available in the system. 
+
+One of the servers is selected as the leader after a leader election process, at the initialization. And the leader is responsible for managing the global consistency of the system, the non-leader servers seek the approval of the leader in order to perform certain tasks. Heartbeat is implemented to identify a failure of a non-leader server, and the leader deletes the state of the disconnected server after identifying. The heartbeat is implemented using gossiping and consensus. 
+
 ## Executable Jar files
+The "executables" folder contains the executable jar files for the client and server.
+
+Command for execute the chat client 
+
+`java -jar client.jar -h server_address [-p server_port] -i identity [-d]`
+
+eg: java -jar client.jar -h localhost -p 4444 -i Adel
+
+Command for execute the chat server 
+
+`java -jar server.jar [server_name] "[location of server configuration file]"`
+
+eg: java -jar server.jar s1 "C:code\src\main\java\config\server_conf.txt"
 ## Instructions to Build the executable Jar
 ## Instructions to Run the Jar
