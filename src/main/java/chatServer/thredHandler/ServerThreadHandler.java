@@ -24,6 +24,7 @@ import java.util.ArrayList;
 public class ServerThreadHandler extends Thread{
 
     private final ServerSocket serverSocket_coordination;
+
     private LeaderUpdate leaderUpdate = new LeaderUpdate();
 
     public ServerThreadHandler(ServerSocket serverSocket_coordination) {
@@ -59,7 +60,7 @@ public class ServerThreadHandler extends Thread{
                             System.out.println("[LOG] | Client id " + clientId + " from s" + sender + " is" + (available ? " " : " not ") + "available");
                         } catch (IOException e) {
 //                            e.printStackTrace();
-                            System.out.println("[ERR] | " + e);
+                            System.out.println("[ERR] | " + e.getMessage());
                         }
                     } else if(jsonObject.get("type").equals("approval_reply_to_cleintid") && jsonObject.get("available") != null && jsonObject.get("threadid") != null) {
                         int available = Boolean.parseBoolean(jsonObject.get("approved").toString()) ? 1 : 0;
@@ -86,7 +87,7 @@ public class ServerThreadHandler extends Thread{
                             MessagePassing.sender(MessageServer.getApprovalReplyToRoomCreate(String.valueOf(available), threadId), endpointSerevr);
                             System.out.println("[LOG] | Room " + roomId + " creation request from client with id " + clientId + " is" + (available ? " " : " not ") + "available");
                         } catch (Exception e) {
-                            System.out.println("[ERR] | " + e);
+                            System.out.println("[ERR] | " + e.getMessage());
                         }
                     } else if (jsonObject.get("type").equals("approval_reply_to_room_create")) {
                         int available = Boolean.parseBoolean(jsonObject.get("available").toString()) ? 1 : 0;
@@ -127,7 +128,7 @@ public class ServerThreadHandler extends Thread{
                                 MessagePassing.sender(MessageServer.getApprovalReplyToJoinRoom(String.valueOf(available), threadId, host, port),destServer);
                                 System.out.println("[LOG] : Joining Room from room [" + formerRoomId + "] to room [" + roomId + "] for client " + clientId + " is" + (serverIDofTargetRoom != -1 ? " " : " not ") + "available");
                             } catch (Exception e) {
-                                System.out.println("[ERR] | " + e);
+                                System.out.println("[ERR] | " + e.getMessage());
                             }
                         }
 
@@ -229,7 +230,7 @@ public class ServerThreadHandler extends Thread{
 
             }
         } catch (IOException e) {
-            System.out.println("[ERR] | " + e);
+            System.out.println("[ERR] | " + e.getMessage());
         }
     }
 }

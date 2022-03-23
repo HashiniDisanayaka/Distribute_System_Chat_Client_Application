@@ -10,6 +10,7 @@ import services.leaderElection.Leader;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -42,6 +43,15 @@ public class MessagePassing {
         }
     }
 
+    public static void sendToBroadcast(JSONObject obj, ArrayList<Socket> socketList) throws IOException {
+        for (Socket each : socketList) {
+            Socket TEMP_SOCK = (Socket) each;
+            PrintWriter TEMP_OUT = new PrintWriter(TEMP_SOCK.getOutputStream());
+            TEMP_OUT.println(obj);
+            TEMP_OUT.flush();
+        }
+    }
+
     public static JSONObject obtainJSONobject (String jStr) {
         JSONObject jsonObject = null;
         try {
@@ -49,12 +59,23 @@ public class MessagePassing {
             Object obj = jsonParser.parse(jStr);
             jsonObject = (JSONObject) obj;
         } catch (ParseException e) {
-            System.out.println("[ERR] | " + e);
+            System.out.println("[ERR] | " + e.getMessage());
         }
         return  jsonObject;
     }
 
     public static boolean isHasKey(JSONObject jObj, String key) {
         return (jObj != null && jObj.get(key) != null);
+    }
+
+    public static boolean checkId(String id) {
+        return (Character.toString(id.charAt(0)).matches("[a-zA-Z]+")
+                && id.matches("[a-zA-Z0-9]+") && id.length() >= 3 && id.length() <= 16);
+    }
+
+    public static void sendClient(JSONObject jsonObject, Socket socket) throws IOException {
+        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        dataOutputStream.write((jsonObject.toJSONString() + "\n").getBytes(StandardCharsets.UTF_8));
+        dataOutputStream.flush();
     }
 }

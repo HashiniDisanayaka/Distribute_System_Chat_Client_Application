@@ -94,7 +94,7 @@ public class ServerMain {
             scheduler.start();
             scheduler.scheduleJob(jobDetail_consensus, trigger_consensus);
         } catch (SchedulerException e) {
-            System.out.println("[ERR] | Error in starting consensus : " + e);
+            System.out.println("[ERR] | Error in starting consensus : " + e.getMessage());
         }
     }
 
