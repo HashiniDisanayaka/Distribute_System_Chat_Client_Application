@@ -22,14 +22,27 @@ The "executables" folder contains the executable jar files for the client and se
 
 Command for execute the chat client 
 
-`java -jar client.jar -h server_address [-p server_port] -i identity [-d]`
+> `java -jar client.jar -h server_address [-p server_port] -i identity [-d]`
 
 eg: java -jar client.jar -h localhost -p 4444 -i Adel
 
 Command for execute the chat server 
 
-`java -jar server.jar [server_name] "[location of server configuration file]"`
+> `java -jar server.jar [server_name] "[location of server configuration file]"`
 
 eg: java -jar server.jar s1 "C:code\src\main\java\config\server_conf.txt"
 ## Instructions to Build the executable Jar
+Development Environment - `IntelliJ IDEA`
+
+> install java (version `1.8`)
+> 
+> install Maven (version `3.6.3`)
+
+run the following commands to install dependencies and build
+
+> `mvn clean install`
+>
+> `mvn clean compile assembly:single`
+
+The output jar will be created inside the `'target'` folder named `Distributed-Chat-System-1.0-SNAPSHOT-jar-with-dependencies.jar`
 ## Instructions to Run the Jar
