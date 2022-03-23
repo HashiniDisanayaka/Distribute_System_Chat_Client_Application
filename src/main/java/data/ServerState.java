@@ -120,6 +120,10 @@ public class ServerState {
         setOfClientThreadHandlers.put(clientThreadHandler.getId(), clientThreadHandler);
     }
 
+    public ClientThreadHandler getClientThreadHandler(Long threadIdentity) {
+        return setOfClientThreadHandlers.get(threadIdentity);
+    }
+
     public ConcurrentHashMap<Integer, Integer> getListOfHeartbeat() {
         return listOfHeartbeat;
     }

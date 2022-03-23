@@ -1,10 +1,8 @@
-package services.LeaderElection;
+package services.leaderElection;
 
 import chatServer.Server;
 import data.ServerState;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import services.message.MessagePassing;
 import services.message.MessageServer;
 
@@ -85,7 +83,7 @@ public class FastBullyAlgorithm implements Runnable{
                     {
                         Thread.sleep( 1500 );
                         Server receiver = ServerState.getInstance().getSetOfservers().get( Leader.getLeader().getLeaderID());
-                        MessagePassing.Sender( MessageServer.heartbeat( String.valueOf( ServerState.getInstance().getServerValue()) ), receiver );
+                        MessagePassing.sender( MessageServer.heartbeat( String.valueOf( ServerState.getInstance().getServerValue()) ), receiver );
                         System.out.println( "[LOG] | Sent heartbeat to leader s" + receiver.getServerIdentity() );
                     }
                 }
@@ -149,7 +147,7 @@ public class FastBullyAlgorithm implements Runnable{
                 Server receiver = ServerState.getInstance().getSetOfservers().get(key);
 
                 try {
-                    MessagePassing.Sender(
+                    MessagePassing.sender(
                             MessageServer.coordinator( String.valueOf(ServerState.getInstance().getServerValue()) ),
                             receiver
                     );
@@ -182,7 +180,7 @@ public class FastBullyAlgorithm implements Runnable{
     public static void sendOkMessage() {
         try {
             Server receiver = ServerState.getInstance().getSetOfservers().get(sourceID);
-            MessagePassing.Sender( MessageServer.sendOk( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver );
+            MessagePassing.sender( MessageServer.sendOk( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver );
 
             System.out.println( "[LOG] | Sent OK to s"+ receiver.getServerIdentity());
         }
@@ -199,7 +197,7 @@ public class FastBullyAlgorithm implements Runnable{
             if( key > ServerState.getInstance().getServerValue() ){
                 Server receiver = ServerState.getInstance().getSetOfservers().get(key);
                 try {
-                    MessagePassing.Sender( MessageServer.election( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver);
+                    MessagePassing.sender( MessageServer.election( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver);
                     System.out.println( "[LOG] | Sent election request to s" + receiver.getServerIdentity());
                 }
                 catch(Exception e){

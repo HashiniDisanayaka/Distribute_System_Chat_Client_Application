@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import services.heartbeat.Consensus;
 import services.heartbeat.Gossiping;
-import services.LeaderElection.FastBullyAlgorithm;
+import services.leaderElection.FastBullyAlgorithm;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

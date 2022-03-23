@@ -7,6 +7,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.json.simple.JSONObject;
+import services.leaderElection.Leader;
 import services.message.MessagePassing;
 import services.message.MessageServer;
 
@@ -69,7 +70,7 @@ public class Gossiping implements Job{
             JSONObject gossipingMessage = messageServer.gossipingMessage(serverState.getServerIdentity(), listOfHeartbeat);
 
             try{
-                MessagePassing.Sender(gossipingMessage, remoteServerArray.get(serverId));
+                MessagePassing.sender(gossipingMessage, remoteServerArray.get(serverId));
                 System.out.println("[LOG] | Gossip heatrbeat information to s" + remoteServerArray.get(serverId).getServerIdentity());
             } catch (IOException e){
                 System.out.println("[ERR] | Server s" + remoteServerArray.get(serverId).getServerIdentity() + " has failed");
@@ -77,4 +78,35 @@ public class Gossiping implements Job{
         }
 
     }
+
+    public static void messageReceive(JSONObject jsonObject) {
+
+        ServerState serverState = ServerState.getInstance();
+        HashMap<String, Long> gossipsFromOthers = (HashMap<String, Long>) jsonObject.get("ListOfHeartbeat");
+        Integer serverValue = (int) (long)jsonObject.get("serverId");
+
+        System.out.println(("Receiving gossip from server: [" + serverValue.toString() + "] gossipping: " + gossipsFromOthers));
+
+        for (String serverId : gossipsFromOthers.keySet()) {
+            Integer numOfLocalHeartbeat = serverState.getListOfHeartbeat().get(Integer.parseInt(serverId));
+            Integer numOfRemoteHeartbeat = (int) (long)gossipsFromOthers.get(serverId);
+            if (numOfLocalHeartbeat != null && numOfRemoteHeartbeat < numOfLocalHeartbeat) {
+                serverState.getListOfHeartbeat().put(Integer.parseInt(serverId), numOfRemoteHeartbeat);
+            }
+        }
+
+        System.out.println(("Current cluster heart beat state is: " + serverState.getListOfHeartbeat()));
+
+        if (Leader.getLeader().isLeaderElected() && Leader.getLeader().getLeaderID().equals(serverState.getServerIdentity())) {
+            if (serverState.getListOfHeartbeat().size() < gossipsFromOthers.size()) {
+                for (String serverId : gossipsFromOthers.keySet()) {
+                    if (!serverState.getListOfHeartbeat().containsKey(serverId)) {
+                        serverState.getSuspectedList().put(Integer.parseInt(serverId), "SUSPECTED");
+                    }
+                }
+            }
+        }
+
+    }
+
 }

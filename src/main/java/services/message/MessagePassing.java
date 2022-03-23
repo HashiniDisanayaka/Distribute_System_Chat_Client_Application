@@ -3,7 +3,10 @@ package services.message;
 import chatServer.Server;
 import data.ServerState;
 import org.json.simple.JSONObject;
-import services.LeaderElection.Leader;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import services.leaderElection.Leader;
+import services.leaderElection.Leader;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +16,7 @@ import java.util.ArrayList;
 
 public class MessagePassing {
 
-    public static void Sender(JSONObject objct, Server endpoint) throws IOException
+    public static void sender(JSONObject objct, Server endpoint) throws IOException
     {
         Socket socket = new Socket(endpoint.getServer_address(), endpoint.getCoordination_port());
         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -37,5 +40,21 @@ public class MessagePassing {
             dataOutputStream.write((obj.toJSONString() + "\n").getBytes( StandardCharsets.UTF_8));
             dataOutputStream.flush();
         }
+    }
+
+    public static JSONObject obtainJSONobject (String jStr) {
+        JSONObject jsonObject = null;
+        try {
+            JSONParser jsonParser = new JSONParser();
+            Object obj = jsonParser.parse(jStr);
+            jsonObject = (JSONObject) obj;
+        } catch (ParseException e) {
+            System.out.println("[ERR] | " + e);
+        }
+        return  jsonObject;
+    }
+
+    public static boolean isHasKey(JSONObject jObj, String key) {
+        return (jObj != null && jObj.get(key) != null);
     }
 }
