@@ -84,7 +84,7 @@ public class FastBullyAlgorithm implements Runnable{
                     if( leaderState && ServerState.getInstance().getServerValue() != Leader.getLeader().getLeaderID())
                     {
                         Thread.sleep( 1500 );
-                        Server receiver = ServerState.getInstance().getServers().get( Leader.getLeader().getLeaderID());
+                        Server receiver = ServerState.getInstance().getSetOfservers().get( Leader.getLeader().getLeaderID());
                         MessagePassing.Sender( MessageServer.heartbeat( String.valueOf( ServerState.getInstance().getServerValue()) ), receiver );
                         System.out.println( "[LOG] | Sent heartbeat to leader s" + receiver.getServerIdentity() );
                     }
@@ -144,9 +144,9 @@ public class FastBullyAlgorithm implements Runnable{
 
     public static void sendCoordinatorMessage() {
         int numberOfRequestsNotSent = 0;
-        for ( int key : ServerState.getInstance().getServers().keySet() ) {
+        for ( int key : ServerState.getInstance().getSetOfservers().keySet() ) {
             if ( key != ServerState.getInstance().getServerValue() ){
-                Server receiver = ServerState.getInstance().getServers().get(key);
+                Server receiver = ServerState.getInstance().getSetOfservers().get(key);
 
                 try {
                     MessagePassing.Sender(
@@ -161,7 +161,7 @@ public class FastBullyAlgorithm implements Runnable{
                 }
             }
         }
-        if( numberOfRequestsNotSent == ServerState.getInstance().getServers().size()-1 ) {
+        if( numberOfRequestsNotSent == ServerState.getInstance().getSetOfservers().size()-1 ) {
             // add self clients and chat rooms to leader state
             List<String> selfClients = ServerState.getInstance().getClientIdList();
             List<List<String>> selfRooms = ServerState.getInstance().getChatRoomList();
@@ -181,7 +181,7 @@ public class FastBullyAlgorithm implements Runnable{
 
     public static void sendOkMessage() {
         try {
-            Server receiver = ServerState.getInstance().getServers().get(sourceID);
+            Server receiver = ServerState.getInstance().getSetOfservers().get(sourceID);
             MessagePassing.Sender( MessageServer.sendOk( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver );
 
             System.out.println( "[LOG] | Sent OK to s"+ receiver.getServerIdentity());
@@ -195,9 +195,9 @@ public class FastBullyAlgorithm implements Runnable{
     {
         System.out.println( "[LOG] | Election started!" );
         int numberOfFailedRequests = 0;
-        for ( int key : ServerState.getInstance().getServers().keySet() ) {
+        for ( int key : ServerState.getInstance().getSetOfservers().keySet() ) {
             if( key > ServerState.getInstance().getServerValue() ){
-                Server receiver = ServerState.getInstance().getServers().get(key);
+                Server receiver = ServerState.getInstance().getSetOfservers().get(key);
                 try {
                     MessagePassing.Sender( MessageServer.election( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver);
                     System.out.println( "[LOG] | Sent election request to s" + receiver.getServerIdentity());

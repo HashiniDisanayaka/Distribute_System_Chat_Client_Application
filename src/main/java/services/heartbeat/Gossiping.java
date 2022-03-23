@@ -24,7 +24,7 @@ public class Gossiping implements Job{
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         String errorFactor = jobDataMap.get("error_factor").toString();
 
-        for (Server server : serverState.getServers().values()) {
+        for (Server server : serverState.getSetOfservers().values()) {
 //            System.out.println(server);
             Integer serverIdentity = server.getServerIdentity();
             Integer serverValue = serverState.getServerIdentity();
@@ -53,11 +53,11 @@ public class Gossiping implements Job{
 
 //        System.out.println(serverState.getServers().size());
 
-        if(serverState.getServers().size() > 1) {
-            Integer serverId = ThreadLocalRandom.current().nextInt( serverState.getServers().size() - 1);
+        if(serverState.getSetOfservers().size() > 1) {
+            Integer serverId = ThreadLocalRandom.current().nextInt( serverState.getSetOfservers().size() - 1);
             ArrayList<Server> remoteServerArray = new ArrayList<>();
 
-            for (Server server : serverState.getServers().values()) {
+            for (Server server : serverState.getSetOfservers().values()) {
                 Integer serverIdentity = server.getServerIdentity();
                 Integer serverValue = serverState.getServerIdentity();
                 if (!serverIdentity.equals(serverValue)) {

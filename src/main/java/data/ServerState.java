@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class ServerState {
@@ -21,7 +22,6 @@ public class ServerState {
     private int coordination_port;
     private int serverIdentity;
     private int numOfPriorServers;
-    private int serverValue;
 
     private static ServerState stateInstance;
     private Room mainHall;
@@ -31,6 +31,9 @@ public class ServerState {
     private final ConcurrentHashMap<Long, ClientThreadHandler> setOfClientThreadHandlers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, Integer> listOfHeartbeat = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, String> suspectedList = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Integer> setOfVotes = new ConcurrentHashMap<>();
+
+    private AtomicBoolean consensus_ongoing = new AtomicBoolean(false);
 
     private ServerState () {}
 
@@ -109,7 +112,7 @@ public class ServerState {
         return  serverIdentity;
     }
 
-    public ConcurrentHashMap<Integer, Server> getServers() {
+    public ConcurrentHashMap<Integer, Server> getSetOfservers() {
         return setOfservers;
     }
 
@@ -125,8 +128,24 @@ public class ServerState {
         return suspectedList;
     }
 
+    public AtomicBoolean consensus_ongoing() {
+        return consensus_ongoing;
+    }
+
+    public ConcurrentHashMap<String, Integer> getSetOfVotes() {
+        return setOfVotes;
+    }
+
+    public synchronized void removeServerFromListOfHeartbeat(Integer serverIdentity) {
+        listOfHeartbeat.remove(serverIdentity);
+    }
+
+    public synchronized void removeServerFromSuspectedList(Integer serverIdentity) {
+        suspectedList.remove(serverIdentity);
+    }
+
     public int getServerValue() {
-        return serverValue;
+        return serverIdentity;
     }
 
     public int getNumberOfPriorServers() {
@@ -136,7 +155,7 @@ public class ServerState {
     public List<String> getClientIdList() {
         List<String> clientIdList = new ArrayList<>();
         setOfRooms.forEach((roomID, room) -> {
-            clientIdList.addAll(room.getClientStateMap().keySet());
+            clientIdList.addAll(room.getSetOfClients().keySet());
         });
         return clientIdList;
     }
@@ -147,7 +166,7 @@ public class ServerState {
             List<String> roomInfo = new ArrayList<>();
             roomInfo.add( room.getOwnerId() );
             roomInfo.add( room.getRoomID() );
-            roomInfo.add( String.valueOf(room.getServerID()) );
+            roomInfo.add( String.valueOf(room.getServerId()) );
 
             chatRoomList.add( roomInfo );
         }

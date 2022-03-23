@@ -7,8 +7,9 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import services.LeaderElection.FastBullyAlgorithm;
+import services.heartbeat.Consensus;
 import services.heartbeat.Gossiping;
+import services.LeaderElection.FastBullyAlgorithm;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -63,6 +64,7 @@ public class ServerMain {
             if(isGossiping){
                 System.out.println("[LOG] | Starting gossiping");
                 gossipingStart();
+                consensusStart();
             }
             while (true){
                 Socket socket_client = serverSocket_client.accept();
@@ -79,6 +81,20 @@ public class ServerMain {
         catch (IOException e){
             System.out.println("[ERR] | Error in Server sockets");
             log.error("Error in Server sockets : ", e);
+        }
+    }
+
+    private static void consensusStart() {
+        try {
+            JobDetail jobDetail_consensus = JobBuilder.newJob(Consensus.class).withIdentity(Global.CONSENSUS, "group1").build();
+            jobDetail_consensus.getJobDataMap().put("voteDuration", 5);
+
+            Trigger trigger_consensus = TriggerBuilder.newTrigger().withIdentity(Global.CONSENSUS_TRIGGER, "group1").withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(10).repeatForever()).build();
+            Scheduler scheduler = new StdSchedulerFactory().getScheduler();
+            scheduler.start();
+            scheduler.scheduleJob(jobDetail_consensus, trigger_consensus);
+        } catch (SchedulerException e) {
+            System.out.println("[ERR] | Error in starting consensus : " + e);
         }
     }
 

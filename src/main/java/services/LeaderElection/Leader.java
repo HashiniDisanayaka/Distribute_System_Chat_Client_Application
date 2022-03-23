@@ -60,4 +60,25 @@ public class Leader
         clientState.setRoomOwner(true);
         room.addMembers(clientState);
     }
+
+    public void removeRemoteChatRoom(Integer serverIdentity) {
+        for (String entry : activeChatRooms.keySet()) {
+            Room remoteRoom = activeChatRooms.get(entry);
+            if(remoteRoom.getServerId() == serverIdentity){
+                for(String client : remoteRoom.getSetOfClients().keySet()){
+                    activeChatRooms.remove(client);
+                }
+                activeChatRooms.remove(entry);
+            }
+        }
+
+    }
+
+    public boolean isLeaderElected() {
+        return (FastBullyAlgorithm.leaderState && FastBullyAlgorithm.leaderUpdateComplete);
+    }
+
+    public Integer getLeaderIdentity() {
+        return leaderID;
+    }
 }

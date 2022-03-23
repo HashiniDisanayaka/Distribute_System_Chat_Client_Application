@@ -7,7 +7,7 @@ public class Room {
     private final String roomId;
     private final int serverId;
 
-    private final HashMap<String,Client> clientStateMap = new HashMap<>();
+    private final HashMap<String,Client> setOfClients = new HashMap<>();
 
     public Room(String clientId, String roomId, int serverId) {
         this.clientId = clientId;
@@ -15,8 +15,12 @@ public class Room {
         this.serverId = serverId;
     }
 
-    public synchronized HashMap<String, Client> getClientStateMap() {
-        return clientStateMap;
+    public synchronized int getServerId() {
+        return serverId;
+    }
+
+    public synchronized HashMap<String, Client> getSetOfClients() {
+        return setOfClients;
     }
 
     public String getOwnerId() {
@@ -27,11 +31,7 @@ public class Room {
         return roomId;
     }
 
-    public synchronized int getServerID() {
-        return serverId;
-    }
-
     public synchronized void addMembers(Client clientState) {
-        this.clientStateMap.put(clientState.getClientID(), clientState);
+        this.setOfClients.put(clientState.getClientID(), clientState);
     }
 }

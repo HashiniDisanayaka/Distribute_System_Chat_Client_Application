@@ -3,32 +3,31 @@ package chatServer;
 import java.net.Socket;
 
 public class Client {
-
-    private String clientID;
-    private String roomID;
+    private String clientId;
+    private String roomId;
     private Socket socket;
     private boolean isRoomOwner = false;
 
-    public Client(String clientID, String roomID, Socket socket) {
-        this.clientID = clientID;
-        this.roomID = roomID;
+    public Client(String clientId, String roomId, Socket socket) {
+        this.clientId = clientId;
+        this.roomId = roomId;
         this.socket = socket;
     }
 
     public String getClientID() {
-        return clientID;
+        return clientId;
     }
 
-    public void setClientID(String clientID) {
-        this.clientID = clientID;
+    public void setClientID(String clientId) {
+        this.clientId = clientId;
     }
 
     public String getRoomID() {
-        return roomID;
+        return roomId;
     }
 
-    public void setRoomID(String roomID) {
-        this.roomID = roomID;
+    public void setRoomID(String roomId) {
+        this.roomId = roomId;
     }
 
     public Socket getSocket() {
