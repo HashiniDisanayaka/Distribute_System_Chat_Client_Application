@@ -88,12 +88,23 @@ public class ServerState {
         this.setOfRooms.put(getMainHallId(), mainHall);
     }
 
+    public String getServerid() {
+        return serverid;
+    }
+    public Room getMainHall() {
+        return mainHall;
+    }
+
     public String getMainHallId() {
         return getMainHallIdbyServerInt(this.serverIdentity);
     }
 
     public static String getMainHallIdbyServerInt(int serverIdentity) {
         return "MainHall-s" + serverIdentity;
+    }
+
+    public ConcurrentHashMap<String, Room> getSetOfRooms() {
+        return setOfRooms;
     }
 
     public String getServer_address() {
@@ -175,5 +186,10 @@ public class ServerState {
             chatRoomList.add( roomInfo );
         }
         return chatRoomList;
+    }
+
+    public void removeClient (String clientId, String formerRoom, Long threadId){
+        this.setOfRooms.get(formerRoom).removeMembers(clientId);
+        this.setOfservers.remove(threadId);
     }
 }

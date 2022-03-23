@@ -75,7 +75,7 @@ public class Consensus implements Job {
                 try {
                     Thread.sleep(Integer.parseInt(voteDuration) + 1000);
                 } catch (InterruptedException e) {
-                    System.out.println("[ERR] | " + e);
+                    System.out.println("[ERR] | " + e.getMessage());
                 }
 
                 System.out.println((String.format("[LOG] | Consensus votes to kick server [%s]: %s", serverIdSuspected, serverState.getSetOfVotes())));

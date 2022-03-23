@@ -97,7 +97,6 @@ public class Leader
         }
     }
 
-
     public void localJoinRoomClient(Client client, String formerRoomId) {
         removeClient(client.getClientID(), formerRoomId);
         addClient(client);
@@ -106,6 +105,10 @@ public class Leader
     public void removeClient(String clientId, String formerRoomId) {
         activeClients.remove(clientId);
         activeChatRooms.get(formerRoomId).removeMembers(clientId);
+    }
+
+    public boolean isLeader() {
+        return ServerState.getInstance().getServerIdentity() == Leader.getLeader().getLeaderID();
     }
 
     public boolean isLeaderElected() {
