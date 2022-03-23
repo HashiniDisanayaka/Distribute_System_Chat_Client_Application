@@ -83,7 +83,7 @@ public class Gossiping implements Job{
 
         ServerState serverState = ServerState.getInstance();
         HashMap<String, Long> gossipsFromOthers = (HashMap<String, Long>) jsonObject.get("ListOfHeartbeat");
-        Integer serverValue = (int) (long)jsonObject.get("serverId");
+        Integer serverValue = (int) (long)jsonObject.get("serverIdentity");
 
         System.out.println(("Receiving gossip from server: [" + serverValue.toString() + "] gossipping: " + gossipsFromOthers));
 

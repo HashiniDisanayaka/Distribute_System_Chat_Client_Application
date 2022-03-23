@@ -154,7 +154,7 @@ public class Consensus implements Job {
     public static void notifyServerDownHandler(JSONObject j_object){
         ServerState serverState = ServerState.getInstance();
         Leader leader = Leader.getLeader();
-        Integer serverId = (int) (long)j_object.get("serverId");
+        Integer serverId = (int) (long)j_object.get("serveridentity");
 
         System.out.println("[LOG] | Server down notification received. Removing server: " + serverId);
 
