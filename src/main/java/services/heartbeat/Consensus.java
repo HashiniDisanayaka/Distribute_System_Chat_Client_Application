@@ -1,13 +1,13 @@
 package services.heartbeat;
 
 import chatServer.Server;
-import data.LeaderState;
 import data.ServerState;
 import org.json.simple.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import services.LeaderElection.Leader;
 import services.message.MessagePassing;
 import services.message.MessageServer;
 
@@ -18,26 +18,26 @@ public class Consensus implements Job {
 
     private ServerState serverState = ServerState.getInstance();
     private MessageServer messageServer = MessageServer.getInstance();
-    private LeaderState leaderState = LeaderState.getInstance();
+    private Leader leader = Leader.getLeader();
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         if (serverState.consensus_ongoing().get()) {
             System.out.println("[LOG] | There is an ongoing consensus.");
         } else {
-            if (leaderState.isLeaderElected()) {
+            if (leader.isLeaderElected()) {
                 serverState.consensus_ongoing().set(true);
-//                performConsensus(context);
+                consensusPerform(jobExecutionContext);
                 serverState.consensus_ongoing().set(false);
             }
         }
     }
 
-    private void consensus (JobExecutionContext jobExecutionContext){
+    private void consensusPerform (JobExecutionContext jobExecutionContext){
         Integer serverIdSuspected =null;
         JobDataMap jobDataMap =jobExecutionContext.getJobDetail().getJobDataMap();
         String voteDuration = jobDataMap.get("voteDuration").toString();
 
-        Integer leaderIdentity = leaderState.getLeaderIdentity();
+        Integer leaderIdentity = leader.getLeaderIdentity();
         Integer serverIdentity = serverState.getServerIdentity();
 
         ArrayList<Server> setOfServers = new ArrayList<>();
@@ -87,7 +87,7 @@ public class Consensus implements Job {
                         MessagePassing.sendBroadcast(notifyServerDown, setOfServers);
                         System.out.println("[LOG] | Notify server s" + serverIdSuspected + " down. Removing...");
 
-                        leaderState.removeRemoteChatRoom(serverIdSuspected);
+                        leader.removeRemoteChatRoom(serverIdSuspected);
                         serverState.removeServerFromListOfHeartbeat(serverIdSuspected);
                         serverState.removeServerFromSuspectedList(serverIdSuspected);
 
