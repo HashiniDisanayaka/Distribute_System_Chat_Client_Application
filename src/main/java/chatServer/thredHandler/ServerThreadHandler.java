@@ -57,12 +57,12 @@ public class ServerThreadHandler extends Thread{
 
                         try {
                             MessagePassing.sender(MessageServer.getApprovalReplyToClientId(String.valueOf(available), threadId), endpointServer);
-                            System.out.println("[LOG] | Client id " + clientId + " from s" + sender + " is" + (available ? " " : " not ") + "available");
+                            System.out.println("[LOG] | Client id " + clientId + " from s" + sender + " is" + (available ? " " : " not ") + "approved");
                         } catch (IOException e) {
 //                            e.printStackTrace();
                             System.out.println("[ERR] | " + e.getMessage());
                         }
-                    } else if(jsonObject.get("type").equals("approval_reply_to_cleintid") && jsonObject.get("available") != null && jsonObject.get("threadid") != null) {
+                    } else if(jsonObject.get("type").equals("approval_reply_to_cleintid") && jsonObject.get("approved") != null && jsonObject.get("threadid") != null) {
                         int available = Boolean.parseBoolean(jsonObject.get("approved").toString()) ? 1 : 0;
                         Long threadId = Long.parseLong(jsonObject.get("threadid").toString());
 
@@ -85,12 +85,12 @@ public class ServerThreadHandler extends Thread{
                         Server endpointSerevr = ServerState.getInstance().getSetOfservers().get(sender);
                         try {
                             MessagePassing.sender(MessageServer.getApprovalReplyToRoomCreate(String.valueOf(available), threadId), endpointSerevr);
-                            System.out.println("[LOG] | Room " + roomId + " creation request from client with id " + clientId + " is" + (available ? " " : " not ") + "available");
+                            System.out.println("[LOG] | Room " + roomId + " creation request from client with id " + clientId + " is" + (available ? " " : " not ") + "approved");
                         } catch (Exception e) {
                             System.out.println("[ERR] | " + e.getMessage());
                         }
                     } else if (jsonObject.get("type").equals("approval_reply_to_room_create")) {
-                        int available = Boolean.parseBoolean(jsonObject.get("available").toString()) ? 1 : 0;
+                        int available = Boolean.parseBoolean(jsonObject.get("approved").toString()) ? 1 : 0;
                         Long threadId = Long.parseLong(jsonObject.get("threadid").toString());
 
                         ClientThreadHandler clientThreadHandler = ServerState.getInstance().getClientThreadHandler(threadId);
@@ -126,14 +126,14 @@ public class ServerThreadHandler extends Thread{
                                 String port = (available) ? String.valueOf(serverOfTargetRoom.getClients_port()) : "";
 
                                 MessagePassing.sender(MessageServer.getApprovalReplyToJoinRoom(String.valueOf(available), threadId, host, port),destServer);
-                                System.out.println("[LOG] : Joining Room from room [" + formerRoomId + "] to room [" + roomId + "] for client " + clientId + " is" + (serverIDofTargetRoom != -1 ? " " : " not ") + "available");
+                                System.out.println("[LOG] : Joining Room from room [" + formerRoomId + "] to room [" + roomId + "] for client " + clientId + " is" + (serverIDofTargetRoom != -1 ? " " : " not ") + "approved");
                             } catch (Exception e) {
                                 System.out.println("[ERR] | " + e.getMessage());
                             }
                         }
 
                     } else if (jsonObject.get("type").equals("approval_reply_to_join_room")) {
-                        int available = Boolean.parseBoolean(jsonObject.get("available").toString()) ? 1 : 0;
+                        int available = Boolean.parseBoolean(jsonObject.get("approved").toString()) ? 1 : 0;
                         Long threadId = Long.parseLong(jsonObject.get("threadid").toString());
                         String host = jsonObject.get("host").toString();
                         String port = jsonObject.get("port").toString();

@@ -34,10 +34,10 @@ public class Gossiping implements Job{
             if(serverIdentity.equals(serverValue)){
                 serverState.getListOfHeartbeat().put(serverIdentity, 0);
             } else {
-                if (numOfHeartbeat != null){
-                    serverState.getListOfHeartbeat().put(serverIdentity, (numOfHeartbeat+1));
-                } else {
+                if (numOfHeartbeat == null){
                     serverState.getListOfHeartbeat().put(serverIdentity, 1);
+                } else {
+                    serverState.getListOfHeartbeat().put(serverIdentity, (numOfHeartbeat+1));
                 }
             }
             numOfHeartbeat = serverState.getListOfHeartbeat().get(serverIdentity);
