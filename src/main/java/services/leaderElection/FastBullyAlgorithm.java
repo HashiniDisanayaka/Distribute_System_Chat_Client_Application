@@ -8,18 +8,23 @@ import services.message.MessageServer;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 public class FastBullyAlgorithm implements Runnable{
 
     String operationType;
     String requestType;
     static int sourceID = -1;
+    static int highestPrior = -1;
     static volatile boolean receivedState = false;
+    static volatile boolean viewReceivedState = false;
+    static volatile boolean nominationRecieved = false;
     static volatile boolean leaderState = false;
     static volatile boolean electionState = false;
 
     public static volatile boolean leaderUpdateComplete = false;
-
+    static List<Integer> view = new ArrayList<>();
+    static List<Integer> answer = new ArrayList<>();
 //    private final Logger LOGGER = LoggerFactory.getLogger( FastBullyAlgorithm.class);
 
     public FastBullyAlgorithm( String operationType) {
@@ -33,13 +38,87 @@ public class FastBullyAlgorithm implements Runnable{
 
     public void run() {
 
-        if(operationType.equals( "Timer" ))
+        if(operationType.equals( "TimerTwo" ))
         {
             System.out.println("[LOG] | Timer started...");
             try
             {
-                // wait 7 seconds
-                Thread.sleep( 7000 );
+                // wait 15 seconds
+                Thread.sleep( 15000 );
+                if(!viewReceivedState)
+                {
+                    // OK not received. Set self as leader
+                    Leader.getLeader().setLeaderID( ServerState.getInstance().getServerValue() );
+                    electionState = false; // allow another election request to come in
+                    leaderState = true;
+                    System.out.println( "[LOG] | Timeout" );
+                    System.out.println( "[LOG] | Server s" + Leader.getLeader().getLeaderID() + " is the leader! " );
+                    Leader.getLeader().resetLeaderInfo(); // reset leader lists when newly elected
+
+                    Runnable sender = new FastBullyAlgorithm( "Sender", "coordinator" );
+                    new Thread( sender ).start();
+                }
+
+                if (viewReceivedState)
+                {
+                    highestPrior = ServerState.getInstance().getServerValue();
+                    for (int serverid : view)
+                    {
+                        if (serverid > highestPrior){
+                            highestPrior = serverid;
+                        }
+                        continue;
+                    }
+                    if (highestPrior == ServerState.getInstance().getServerValue)
+                    {
+                        Leader.getLeader().setLeaderID( ServerState.getInstance().getServerValue() );
+                        leaderState = true;
+                        System.out.println( "[LOG] | Server s" + Leader.getLeader().getLeaderID() + " is the leader! " );
+                        Leader.getLeader().resetLeaderInfo(); // reset leader lists when newly elected
+
+                        Runnable sender = new FastBullyAlgorithm( "Sender", "coordinator" );
+                        new Thread( sender ).start();
+
+                    }
+
+                    else
+                    {
+                        Leader.getLeader().setLeaderID( highestPrior);
+                        leaderState = true;
+                        leaderUpdateComplete = false;
+                        electionState = false;
+                        receivedState = false;
+                        System.out.println( "INFO : Server s" + Leader.getLeader().getLeaderID()
+                                                    + " is selected as leader! " );
+
+                        // send local client list and chat room list to leader
+                        try
+                        {
+                            MessagePassing.sendToLeader(
+                                    MessageServer.LeaderUpdate(
+                                            ServerState.getInstance().getClientIdList(),
+                                            ServerState.getInstance().getChatRoomList()
+                                    )
+                            );
+                        } catch( IOException e ) {
+                            System.out.println("WARN : Leader state update message could not be sent");
+                        }
+                    }
+                }
+            }
+            catch( Exception e )
+            {
+                System.out.println( "[ERROR] | Exception in timer thread!" );
+            }
+        }
+
+        if(operationType.equals( "TimerTwoElec" ))
+        {
+            System.out.println("[LOG] | Timer started...");
+            try
+            {
+                // wait 15 seconds
+                Thread.sleep( 15000 );
                 if( !receivedState )
                 {
                     // OK not received. Set self as leader
@@ -54,17 +133,94 @@ public class FastBullyAlgorithm implements Runnable{
                     new Thread( sender ).start();
                 }
 
-                if( receivedState && !leaderState )
+                if( receivedState)
                 {
-                    System.out.println( "[LOG] | Timeout" );
-                    System.out.println( "[LOG] | Coordinator message was not received" );
-                    electionState = false;
-                    receivedState = false;
+                    highestPrior = ServerState.getInstance().getServerValue();
+                    for (int serverid : answer)
+                    {
+                        if (serverid > highestPrior){
+                            highestPrior = serverid;
+                        }
+                        continue;
+                    }
 
+                    for (int serverid : answer)
+                    {
+                        if (highestPrior == serverid){
+                            answer.remove(highestPrior);
+                            break;
+                        }
+                        continue;
+                    }
+
+                    Runnable sender = new FastBullyAlgorithm( "Sender", "nomination" );
+                    new Thread( sender ).start();
+                }
+            }
+            catch( Exception e )
+            {
+                System.out.println( "[ERROR] | Exception in timer thread!" );
+            }
+        }
+
+        if (operationType.equals("TimerThree"))
+        {
+            System.out.println("[LOG] | Timer started...");
+            try {
+                // wait 15 seconds
+                Thread.sleep(15000);
+                if (!leaderState )
+                {
+                    if (answer.isEmpty())
+                    {
+                        Runnable sender = new FastBullyAlgorithm("Sender","election");
+                        new Thread(sender).start();
+                    }
+                    else{
+                        highestPrior = ServerState.getInstance().getServerValue();
+                        for (int serverid : answer)
+                        {
+                            if (serverid > highestPrior){
+                                highestPrior = serverid;
+                            }
+                            continue;
+                        }
+
+                        for (int serverid : answer)
+                        {
+                            if (highestPrior == serverid){
+                                answer.remove(highestPrior);
+                                break;
+                            }
+                            continue;
+                        }
+                        Runnable sender = new FastBullyAlgorithm( "Sender", "nomination" );
+                        new Thread( sender ).start();
+                    }
+                }
+            }
+            catch( Exception e )
+            {
+                System.out.println( "[ERROR] | Exception in timer thread!" );
+            }
+        }
+
+
+
+        if (operationType.equals("TimerFour"))
+        {
+            System.out.println("[LOG] | Timer started...");
+            try {
+                // wait 8 seconds
+                Thread.sleep(8000);
+                if (!nominationRecieved || !leaderState)
+                {
+                    System.out.println("[LOG] | Election procedure restarting");
                     Runnable sender = new FastBullyAlgorithm( "Sender", "election" );
                     new Thread( sender ).start();
                 }
             }
+
             catch( Exception e )
             {
                 System.out.println( "[ERROR] | Exception in timer thread!" );
@@ -102,6 +258,39 @@ public class FastBullyAlgorithm implements Runnable{
 
         if(operationType.equals( "Sender" ))
         {
+            if(requestType.equals( "iamup" ))
+            {
+                try
+                {
+                    sendIAmUpMessage();
+                }
+                catch( Exception e )
+                {
+                    System.out.println( "[ERROR] | Server has failed,  request cannot be processed" );
+                }
+            }
+            if(requestType.equals( "view" ))
+            {
+                try
+                {
+                    sendViewMessage();
+                }
+                catch( Exception e )
+                {
+                    System.out.println( "[ERROR] | Server has failed, election request cannot be processed" );
+                }
+            }
+            if(requestType.equals( "nomination" ))
+            {
+                try
+                {
+                    sendNominationMessage();
+                }
+                catch( Exception e )
+                {
+                    System.out.println( "[ERROR] | Server has failed, election request cannot be processed" );
+                }
+            }
             if(requestType.equals( "election" ))
             {
                 try
@@ -189,6 +378,74 @@ public class FastBullyAlgorithm implements Runnable{
         }
     }
 
+    public static void sendNominationMessage()
+    {
+        System.out.println( "[LOG] | Sending Nomination Message!" );
+        try {
+            Server receiver = ServerState.getInstance().getSetOfservers().get(highestPrior);
+            MessagePassing.sender( MessageServer.sendNomination( ServerState.getInstance().getServerValue()), receiver );
+
+            System.out.println( "[LOG] | Sent OK to s"+ receiver.getServerIdentity());
+            Runnable sender = new FastBullyAlgorithm("Sender","TimerThree");
+            new Thread(sender).start();
+        }
+        catch(Exception e) {
+            System.out.println( "[ERROR] | Server s"+sourceID+" has failed. OK message cannot be sent");
+        }
+    }
+    public static void sendIAmUpMessage()
+    {
+
+        System.out.println( "[LOG] | I am up" );
+        
+        int numberOfFailedRequests = 0;
+        for ( int key : ServerState.getInstance().getSetOfservers().keySet() ) {
+            
+            Server receiver = ServerState.getInstance().getSetOfservers().get(key);
+            try {
+                MessagePassing.sender( MessageServer.iamup(String.valueOf(ServerState.getInstance().getServerValue())) receiver);
+                System.out.println( "[LOG] | I am up s" + receiver.getServerIdentity());
+            }
+            catch(Exception e){
+                System.out.println( "[ERROR] | Server s"+receiver.getServerIdentity()+" has failed, cannot send i am up");
+                numberOfFailedRequests++;
+            }
+            
+
+        }
+        /*if (numberOfFailedRequests == ServerState.getInstance().getNumberOfPriorServers()) {
+            if(!electionState){
+                //startTime=System.currentTimeMillis();
+                electionState = true;
+                receivedState = false;
+                Runnable timer = new FastBullyAlgorithm("TimerTwo");
+                new Thread(timer).start();
+            }
+        }*/
+        
+        Runnable timer = new FastBullyAlgorithm("TimerTwo");
+        new Thread(timer).start();
+
+    }
+
+
+    public static void sendViewMessage()
+    {
+        System.out.println( "[LOG] | Sending View Message!" );
+        try {
+            Server receiver = ServerState.getInstance().getSetOfservers().get(sourceID);
+            MessagePassing.sender( MessageServer.sendView( ServerState.getInstance().getServerValue()), receiver);
+
+            System.out.println( "[LOG] | Sent OK to s"+ receiver.getServerIdentity());
+        }
+        catch(Exception e) {
+            System.out.println( "[ERROR] | Server s"+sourceID+" has failed. OK message cannot be sent");
+        }
+
+
+
+    }
+
     public static void sendElectionMessage()
     {
         System.out.println( "[LOG] | Election started!" );
@@ -212,7 +469,7 @@ public class FastBullyAlgorithm implements Runnable{
                 //startTime=System.currentTimeMillis();
                 electionState = true;
                 receivedState = false;
-                Runnable timer = new FastBullyAlgorithm("Timer");
+                Runnable timer = new FastBullyAlgorithm("TimerTwo");
                 new Thread(timer).start();
             }
         }
@@ -221,6 +478,27 @@ public class FastBullyAlgorithm implements Runnable{
     public static void receiveMessages(JSONObject j_object) {
         String option = j_object.get( "option" ).toString();
         switch( option ) {
+
+            case "iamup" :
+                sourceID = Integer.parseInt(j_object.get( "source" ).toString());
+                System.out.println( "INFO : recovery from s" + sourceID );
+                Runnable sender = new FastBullyAlgorithm( "Sender", "view" );
+                new Thread( sender ).start();
+                break;
+            case "view" :
+                sourceID = Integer.parseInt(j_object.get( "source" ).toString());
+                view.add(sourceID);
+                viewReceivedState = true;
+                break;
+            
+            case "nomination" :
+                nominationRecieved = true;
+                leaderState = true;
+                Runnable sender = new FastBullyAlgorithm( "Sender", "coordinator" );
+                new Thread( sender ).start();
+                electionState = false;
+                break;
+
             case "election":
                 // {"option": "election", "source": 1}
                 sourceID = Integer.parseInt(j_object.get( "source" ).toString());
@@ -236,7 +514,7 @@ public class FastBullyAlgorithm implements Runnable{
                     //startTime = System.currentTimeMillis();
                     electionState = true;
 
-                    Runnable timer = new FastBullyAlgorithm( "Timer" );
+                    Runnable timer = new FastBullyAlgorithm( "TimerTwo" );
                     new Thread( timer ).start();
                     System.out.println( "INFO : Election started");
                 }
@@ -245,7 +523,10 @@ public class FastBullyAlgorithm implements Runnable{
                 // {"option": "ok", "sender": 1}
                 receivedState = true;
                 int senderID = Integer.parseInt(j_object.get( "sender" ).toString());
+                answer.add(senderID);
                 System.out.println( "INFO : Received OK from s" + senderID );
+                Runnable timer = new FastBullyAlgorithm("TimerFour");
+                new Thread(timer).start();
                 break;
             }
             case "coordinator":
@@ -281,11 +562,13 @@ public class FastBullyAlgorithm implements Runnable{
         }
     }
 
+
     public static void initialize()
     {
         // Initiate election
         System.out.println("[LOG] | Initialize fast bully algorithm ");
-        Runnable sender = new FastBullyAlgorithm("Sender","election");
+        Runnable sender = new FastBullyAlgorithm("Sender","iamup");
         new Thread(sender).start();
     }
+
 }
