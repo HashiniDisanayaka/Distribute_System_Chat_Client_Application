@@ -25,7 +25,7 @@ public class LeaderUpdate extends Thread {
                     leaderUpdateInProgress = false;
                     FastBullyAlgorithm.leaderUpdateComplete = true;
                     System.out.println("[LOG] | Leader updated successfully!");
-
+                    
                     List<String> clientIdentityList = ServerState.getInstance().getClientIdList();
                     List<List<String>> chatRoomList = ServerState.getInstance().getChatRoomList();
 
