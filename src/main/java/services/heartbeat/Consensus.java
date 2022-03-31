@@ -21,14 +21,14 @@ public class Consensus implements Job {
     private Leader leader = Leader.getLeader();
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        if (serverState.consensus_ongoing().get()) {
-            System.out.println("[LOG] | There is an ongoing consensus.");
-        } else {
+        if (!serverState.consensus_ongoing().get()) {
             if (leader.isLeaderElected()) {
                 serverState.consensus_ongoing().set(true);
                 consensusPerform(jobExecutionContext);
                 serverState.consensus_ongoing().set(false);
             }
+        } else {
+            System.out.println("[LOG] | There is an ongoing consensus.");
         }
     }
 
@@ -154,7 +154,7 @@ public class Consensus implements Job {
     public static void notifyServerDownHandler(JSONObject j_object){
         ServerState serverState = ServerState.getInstance();
         Leader leader = Leader.getLeader();
-        Integer serverId = (int) (long)j_object.get("serveridentity");
+        Integer serverId = (int) (long)j_object.get("serverIdentity");
 
         System.out.println("[LOG] | Server down notification received. Removing server: " + serverId);
 

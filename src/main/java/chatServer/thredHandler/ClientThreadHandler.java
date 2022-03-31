@@ -168,7 +168,7 @@ public class ClientThreadHandler extends Thread{
             if (Leader.getLeader().isLeader()) {
                 boolean available = !Leader.getLeader().isClientIdAlreadyTaken(clientId);
                 availableClientIdentity = available ? 1 : 0;
-                System.out.println("[LOG] | Client id " + clientId + " is" + (available ? " " : " not ") + "available");
+                System.out.println("[LOG] | Client id " + clientId + " is" + (available ? " " : " not ") + "approved");
 
             } else {
                 try {
@@ -224,7 +224,7 @@ public class ClientThreadHandler extends Thread{
     private void messageSend(ArrayList<Socket> socketList, MessageContext messageContext) throws IOException {
         JSONObject sendToClient = new JSONObject();
         if (messageContext.messageType.equals(MessageContext.MESSAGE_TYPE.NEW_ID)) {
-            sendToClient = MessageClient.getAvailableNewID(messageContext.isNewClientIdAvailable);
+            sendToClient = MessageClient.getApprovalNewID(messageContext.isNewClientIdAvailable);
             sendClient(sendToClient,socket);
 
         } else if (messageContext.messageType.equals(MessageContext.MESSAGE_TYPE.JOIN_ROOM)) {
@@ -273,7 +273,7 @@ public class ClientThreadHandler extends Thread{
             if (Leader.getLeader().isLeader()) {
                 boolean available = Leader.getLeader().isRoomCreationAvailable(newRoomId);
                 availableRoomCreation = available ? 1 : 0;
-                System.out.println("[LOG] | Room " + newRoomId + " creation request from client " + client.getClientID() + " is " + (available ? " " : " not ") + "available");
+                System.out.println("[LOG] | Room " + newRoomId + " creation request from client " + client.getClientID() + " is " + (available ? " " : " not ") + "approved");
 
             } else {
                 try {
@@ -378,7 +378,7 @@ public class ClientThreadHandler extends Thread{
     private void joinRoom(String roomId) throws IOException, InterruptedException {
         String roomIdFormer = client.getRoomID();
 
-        if (client.isRoomOwner()) { //already owns a room
+        if (client.isRoomOwner()) {
             MessageContext messageContext = new MessageContext().setClientId(client.getClientID()).setRoomId(roomIdFormer) .setFormerRoomId(roomIdFormer);
 
             System.out.println("[WARN] | Join room denied, Client " + client.getClientID() + " Owns another room");
@@ -531,6 +531,7 @@ public class ClientThreadHandler extends Thread{
         messageSend(null, messageContext.setMessageType(MessageContext.MESSAGE_TYPE.SERVER_CHANGE));
         messageSend(SocketList, messageContext.setMessageType(MessageContext.MESSAGE_TYPE.BROADCAST_JOIN_ROOM));
 
+        //TODO : check sync
         while (!Leader.getLeader().isLeaderElected()) {
             Thread.sleep(1000);
         }
@@ -592,6 +593,7 @@ public class ClientThreadHandler extends Thread{
                         .setRoomId(roomId)
                         .setIsDeleteRoomAvailable("true");
 
+                //TODO : check sync
                 while (!Leader.getLeader().isLeaderElected()) {
                     Thread.sleep(1000);
                 }

@@ -200,10 +200,10 @@ public class MessageServer {
         return jsonObject;
     }
 
-    public static JSONObject answerMessage(Integer suspectServerId, String vote, Integer votedId){
+    public static JSONObject answerMessage(Integer suspectServerIdentity, String vote, Integer votedId){
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "answervote");
-        jsonObject.put("suspectServerId", suspectServerId);
+        jsonObject.put("suspectServerIdentity", suspectServerIdentity);
         jsonObject.put("votedId", votedId);
         jsonObject.put("vote", vote);
         return jsonObject;
