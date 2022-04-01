@@ -25,7 +25,6 @@ public class FastBullyAlgorithm implements Runnable{
     public static volatile boolean leaderUpdateComplete = false;
     static List<Integer> view = new ArrayList<>();
     static List<Integer> answer = new ArrayList<>();
-//    private final Logger LOGGER = LoggerFactory.getLogger( FastBullyAlgorithm.class);
 
     public FastBullyAlgorithm( String operationType) {
         this.operationType = operationType;
@@ -112,7 +111,7 @@ public class FastBullyAlgorithm implements Runnable{
             }
         }
 
-        if(operationType.equals( "TimerTwoElect" ))
+        else if(operationType.equals( "TimerTwoElect" ))
         {
             System.out.println("[LOG] | Timer for election started...");
             try
@@ -152,7 +151,7 @@ public class FastBullyAlgorithm implements Runnable{
                         }
                         continue;
                     }
-
+                    System.out.println( "[LOG] | Sending nomination to " + highestPrior );
                     Runnable sender = new FastBullyAlgorithm( "Sender", "nomination" );
                     new Thread( sender ).start();
                 }
@@ -163,7 +162,7 @@ public class FastBullyAlgorithm implements Runnable{
             }
         }
 
-        if (operationType.equals("TimerThree"))
+        else if (operationType.equals("TimerThree"))
         {
             System.out.println("[LOG] | Timer three started...");
             try {
@@ -205,15 +204,13 @@ public class FastBullyAlgorithm implements Runnable{
             }
         }
 
-
-
-        if (operationType.equals("TimerFour"))
+        else if (operationType.equals("TimerFour"))
         {
             System.out.println("[LOG] | Timerfour started...");
             try {
                 // wait 8 seconds
                 Thread.sleep(8000);
-                if (!nominationRecieved || !leaderState)
+                if (!nominationRecieved && !leaderState)
                 {
                     System.out.println("[LOG] | Election procedure restarting");
                     Runnable sender = new FastBullyAlgorithm( "Sender", "election" );
@@ -227,8 +224,7 @@ public class FastBullyAlgorithm implements Runnable{
             }
         }
 
-
-        if(operationType.equals( "Heartbeat" ))
+        else if(operationType.equals( "Heartbeat" ))
         {
             while( true )
             {
@@ -249,14 +245,13 @@ public class FastBullyAlgorithm implements Runnable{
                     leaderState = false;
                     leaderUpdateComplete = false;
                     System.out.println( "[ERROR] | Leader has failed!" );
-
                     Runnable election = new FastBullyAlgorithm( "Sender", "election" );
                     new Thread( election ).start();
                 }
             }
         }
 
-        if(operationType.equals( "Sender" ))
+        else if(operationType.equals( "Sender" ))
         {
             if(requestType.equals( "iamup" ))
             {
@@ -329,7 +324,8 @@ public class FastBullyAlgorithm implements Runnable{
     }
 
 
-    public static void sendCoordinatorMessage() {
+    public static void sendCoordinatorMessage()
+    {
         int numberOfRequestsNotSent = 0;
         for ( int key : ServerState.getInstance().getSetOfservers().keySet() ) {
             if ( key != ServerState.getInstance().getServerValue() ){
@@ -366,7 +362,8 @@ public class FastBullyAlgorithm implements Runnable{
         }
     }
 
-    public static void sendOkMessage() {
+    public static void sendOkMessage()
+    {
         try {
             Server receiver = ServerState.getInstance().getSetOfservers().get(sourceID);
             MessagePassing.sender( MessageServer.sendOk( String.valueOf(ServerState.getInstance().getServerValue()) ), receiver );
@@ -393,14 +390,16 @@ public class FastBullyAlgorithm implements Runnable{
             System.out.println( "[ERROR] | Server s"+sourceID+" has failed. OK message cannot be sent");
         }
     }
+
     public static void sendIAmUpMessage()
     {
 
-        System.out.println( "[LOG] | I am up" );
+        System.out.println( "[LOG] | I am up message " );
         
         int numberOfFailedRequests = 0;
         for ( int key : ServerState.getInstance().getSetOfservers().keySet() ) {
-            
+
+            if (key == ServerState.getInstance().getServerIdentity()) continue;
             Server receiver = ServerState.getInstance().getSetOfservers().get(key);
             try {
                 MessagePassing.sender( MessageServer.iamup(ServerState.getInstance().getServerValue()),receiver);
@@ -410,14 +409,13 @@ public class FastBullyAlgorithm implements Runnable{
                 System.out.println( "[ERROR] | Server s"+receiver.getServerIdentity()+" has failed, cannot send i am up");
                 numberOfFailedRequests++;
             }
-            
 
         }
+
         Runnable timer = new FastBullyAlgorithm("TimerTwo");
         new Thread(timer).start();
 
     }
-
 
     public static void sendViewMessage()
     {
@@ -431,9 +429,6 @@ public class FastBullyAlgorithm implements Runnable{
         catch(Exception e) {
             System.out.println( "[ERROR] | Server s"+sourceID+" has failed. OK message cannot be sent");
         }
-
-
-
     }
 
     public static void sendElectionMessage()
@@ -465,9 +460,10 @@ public class FastBullyAlgorithm implements Runnable{
         }
     }
 
-    public static void receiveMessages(JSONObject j_object) {
+    public static void receiveMessages(JSONObject j_object)
+    {
         String option = j_object.get( "option" ).toString();
-        Runnable sender;
+        Runnable sender , timer;
         switch( option ) {
 
             case "iamup" :
@@ -478,6 +474,7 @@ public class FastBullyAlgorithm implements Runnable{
                 break;
             case "view" :
                 sourceID = Integer.parseInt(j_object.get( "source" ).toString());
+                System.out.println( "INFO : view from s" + sourceID );
                 view.add(sourceID);
                 viewReceivedState = true;
                 break;
@@ -499,16 +496,8 @@ public class FastBullyAlgorithm implements Runnable{
                     sender = new FastBullyAlgorithm( "Sender", "ok" );
                     new Thread( sender ).start();
                 }
-                if( !electionState ) {
-                    sender = new FastBullyAlgorithm( "Sender", "election" );
-                    new Thread( sender ).start();
-                    //startTime = System.currentTimeMillis();
-                    electionState = true;
-
-                    Runnable timer = new FastBullyAlgorithm( "TimerTwoElect" );
-                    new Thread( timer ).start();
-                    System.out.println( "INFO : Election started");
-                }
+                timer = new FastBullyAlgorithm( "TimerFour" );
+                new Thread( timer ).start();
                 break;
             case "ok": {
                 // {"option": "ok", "sender": 1}
@@ -516,8 +505,6 @@ public class FastBullyAlgorithm implements Runnable{
                 int senderID = Integer.parseInt(j_object.get( "sender" ).toString());
                 answer.add(senderID);
                 System.out.println( "INFO : Received OK from s" + senderID );
-                Runnable timer = new FastBullyAlgorithm("TimerFour");
-                new Thread(timer).start();
                 break;
             }
             case "coordinator":
@@ -552,8 +539,7 @@ public class FastBullyAlgorithm implements Runnable{
             }
         }
     }
-
-
+    
     public static void initialize()
     {
         // Initiate election

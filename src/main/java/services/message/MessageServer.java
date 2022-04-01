@@ -44,19 +44,19 @@ public class MessageServer {
 
     public static JSONObject iamup(Integer serverIdentity) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", "iamup");
+        jsonObject.put("option", "iamup");
         jsonObject.put("source", serverIdentity);
         return jsonObject;
     }
     public static JSONObject sendNomination(Integer serverIdentity) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", "nomination");
+        jsonObject.put("option", "nomination");
         jsonObject.put("source", serverIdentity);
         return jsonObject;
     }
     public static JSONObject sendView(Integer serverIdentity) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("type", "view");
+        jsonObject.put("option", "view");
         jsonObject.put("source", serverIdentity);
         return jsonObject;
     }
