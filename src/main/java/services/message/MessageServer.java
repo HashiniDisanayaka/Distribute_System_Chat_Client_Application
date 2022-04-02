@@ -42,6 +42,25 @@ public class MessageServer {
         return jsonObject;
     }
 
+    public static JSONObject iamup(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "iamup");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+    public static JSONObject sendNomination(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "nomination");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+    public static JSONObject sendView(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "view");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+
     public static JSONObject heartbeat( String sender) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("option", "heartbeat");

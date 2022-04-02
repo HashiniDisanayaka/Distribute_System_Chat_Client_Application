@@ -66,15 +66,15 @@ public class ServerState {
                     this.client_port = portClient;
                     this.coordination_port = portCoordination;
                     this.serverIdentity = serverValue;
-                    System.out.println(serverIdentity);
-                    System.out.println(server_address);
-                    System.out.println(coordination_port);
-                    System.out.println(client_port);
+//                    System.out.println(serverIdentity);
+//                    System.out.println(server_address);
+//                    System.out.println(coordination_port);
+//                    System.out.println(client_port);
                 }
 
                 Server server = new Server(serverValue, serverAdd, portClient, portCoordination);
                 setOfservers.put(server.getServerIdentity(), server);
-                System.out.println(serverValue);
+//                System.out.println(serverValue);
             }
             readFile.close();
         } catch (FileNotFoundException e) {
