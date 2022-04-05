@@ -42,6 +42,26 @@ public class MessageServer {
         return jsonObject;
     }
 
+    public static JSONObject iamup(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "iamup");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+
+    public static JSONObject sendNomination(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "nomination");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+    public static JSONObject sendView(Integer serverIdentity) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("option", "view");
+        jsonObject.put("source", serverIdentity);
+        return jsonObject;
+    }
+
     public static JSONObject heartbeat( String sender) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("option", "heartbeat");
@@ -98,10 +118,10 @@ public class MessageServer {
         return jsonObject;
     }
 
-    public static JSONObject getApprovalReplyToClientId(String available, String threadID) {
+    public static JSONObject getApprovalReplyToClientId(String approved, String threadID) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "approval_reply_to_cleintid");
-        jsonObject.put("available", available);
+        jsonObject.put("approved", approved);
         jsonObject.put("threadid", threadID);
         return jsonObject;
     }
@@ -125,10 +145,10 @@ public class MessageServer {
         return jsonObject;
     }
 
-    public static JSONObject getApprovalReplyToRoomCreate(String available, String threadId) {
+    public static JSONObject getApprovalReplyToRoomCreate(String approved, String threadId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "approval_reply_to_room_create");
-        jsonObject.put("available", available);
+        jsonObject.put("approved", approved);
         jsonObject.put("threadid", threadId);
         return jsonObject;
     }
@@ -145,10 +165,10 @@ public class MessageServer {
         return jsonObject;
     }
 
-    public static JSONObject getApprovalReplyToJoinRoom(String available, String threadId, String host, String port) {
+    public static JSONObject getApprovalReplyToJoinRoom(String approved, String threadId, String host, String port) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("type", "approval_reply_to_join_room");
-        jsonObject.put("available", available);
+        jsonObject.put("approved", approved);
         jsonObject.put("host", host);
         jsonObject.put("port", port);
         jsonObject.put("threadid", threadId);

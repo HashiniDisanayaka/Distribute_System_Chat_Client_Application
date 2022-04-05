@@ -48,9 +48,11 @@ public class ServerThreadHandler extends Thread{
                         String threadId = jsonObject.get("threadid").toString();
                         int sender = Integer.parseInt(jsonObject.get("sender").toString());
                         boolean available = !Leader.getLeader().isClientIdAvailable(clientId);
+                        System.out.println("Availability : " +available);
 
                         if(available){
                             Client client = new Client(clientId, ServerState.getMainHallIdbyServerInt(sender), null);
+                            System.out.println("-------- Active chat client entry -----");
                             Leader.getLeader().addClient(client);
                         }
                         Server endpointServer = ServerState.getInstance().getSetOfservers().get(sender);
@@ -194,6 +196,7 @@ public class ServerThreadHandler extends Thread{
                         System.out.println("[LOG] | Leader deletd the client '" + clientId + "'.");
 
                     } else if (jsonObject.get("type").equals("leader_state_update")) {
+                        System.out.print("JSON object : " + jsonObject);
                         if( Leader.getLeader().isLeaderElectedAndIamLeader() )
                         {
                             if(!leaderUpdate.isAlive()) {

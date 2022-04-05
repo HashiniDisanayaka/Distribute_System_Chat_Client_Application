@@ -74,5 +74,6 @@ public class LeaderUpdate extends Thread {
             JSONObject jsonObject_room = (JSONObject)chatRoom;
             Leader.getLeader().addApprovedRoom( jsonObject_room.get("clientid").toString(), jsonObject_room.get("roomid").toString(), Integer.parseInt(jsonObject_room.get("serverid").toString()) );
         }
+        System.out.print("Active chat rooms : " + Leader.getLeader().getActiveChatRooms());
     }
 }

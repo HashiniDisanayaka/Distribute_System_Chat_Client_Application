@@ -523,7 +523,7 @@ public class ClientThreadHandler extends Thread{
 
         MessageContext messageContext = new MessageContext()
                 .setClientId(client.getClientID())
-                .setRoomId(clientId)
+                .setRoomId(roomId)
                 .setFormerRoomId(roomIdFormer)
                 .setIsServerChangeAvailable("true")
                 .setAvailableServerId(ServerState.getInstance().getServerid());

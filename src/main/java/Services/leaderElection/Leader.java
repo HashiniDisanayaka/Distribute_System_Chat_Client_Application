@@ -3,17 +3,25 @@ package services.leaderElection;
 import chatServer.Client;
 import chatServer.Room;
 import data.ServerState;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.*;
 
+@Slf4j
 public class Leader
 {
     private Integer leaderID;
 
     private final List<String> activeClients = new ArrayList<>();
-    private final HashMap<String,Room> activeChatRooms = new HashMap<>(); // <roomID, room obj>
+
+    public ConcurrentHashMap<String, Room> getActiveChatRooms() {
+        return activeChatRooms;
+    }
+
+    private final ConcurrentHashMap<String,Room> activeChatRooms = new ConcurrentHashMap<>(); // <roomID, room obj>
 
     // singleton
     private static Leader leader;
@@ -57,6 +65,9 @@ public class Leader
 
     public void addClient(Client client) {
         activeClients.add(client.getClientID());
+        System.out.println("Active chatrooms : ");
+        System.out.print(activeChatRooms);
+        log.info("Active chatrooms : " , activeChatRooms);
         activeChatRooms.get(client.getRoomID()).addMembers(client);
     }
 
